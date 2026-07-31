@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tasks - Minimalist Task Manager">
+    <title>Tasks - Todo GUI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/client.js" defer></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body id="body">
+    <div class="app-wrapper">
+        <!-- Main Content Card -->
+        <div class="app-card">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-main">
+                    <div class="title-area">
+                        <h1>Tasks</h1>
+                        <span class="count-badge">0 remaining</span>
+                    </div>
+                    <p class="subtitle">Manage your daily tasks and workflow priorities.</p>
+                </div>
+                <button class="btn btn-primary" id="btn-add-task">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>New Task</span>
+                </button>
+            </header>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="toolbar">
+                <div class="filter-tabs">
+                    <button class="tab-btn active">All <span class="tab-count">0</span></button>
+                    <button class="tab-btn">Pending <span class="tab-count">0</span></button>
+                    <button class="tab-btn">Completed <span class="tab-count">0</span></button>
+                    <button class="tab-btn">Cancelled <span class="tab-count">0</span></button>
+                </div>
+                <div class="search-box">
+                    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" placeholder="Filter tasks..." class="search-input">
+                </div>
+            </div>
+
+            <!-- Task List Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="col-check"></th>
+                            <th class="col-id">ID</th>
+                            <th class="col-name">Task Name</th>
+                            <th class="col-desc">Description</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-actions"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamically populated by js/client.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Stats / Status -->
+            <footer class="app-footer">
+                <span class="footer-info">Loading tasks...</span>
+                <div class="footer-actions">
+                    <button class="btn-link">Clear completed</button>
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+
+</html>
