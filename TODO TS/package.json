@@ -1,0 +1,22 @@
+{
+  "name": "todo-ts",
+  "version": "1.0.0",
+  "description": "A lightweight, zero-dependency Task Management application built with modern Node.js ES Modules. It provides both an interactive Command-Line Interface (CLI) and a browser-based Web GUI backed by a RESTful HTTP API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild public/ts/client.tsx --outfile=public/js/client.js --bundle --format=esm",
+    "start": "npm run build && tsx index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "tsx": "^4.23.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
+  }
+}
