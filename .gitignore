@@ -1,2 +1,6 @@
+.DS_Store
 *.pdf
 /.idea/
+
+*/node_modules
+/TODO\ TS/node_modules/
