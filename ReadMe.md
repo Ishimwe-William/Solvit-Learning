@@ -37,3 +37,14 @@ const color: number | string = "fffff" //union
 
 ### Next
 2. Create Next JS TODO App with routes: `App Router` and `Navigation`
+
+### Styling
+- styled component: https://styled-components.com/
+- tailwind
+- normal styling
+- Frameworks: 
+  - shadcn: https://ui.shadcn.com/ requires [tailwing css](https://tailwindcss.com/)
+  
+### Routing
+- React router dom
+- React router
