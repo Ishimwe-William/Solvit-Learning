@@ -5,6 +5,7 @@ import { TaskTableViewGroup } from "../components/TaskTableViewGroup";
 import { TaskGridView } from "../components/TaskGridView";
 import { useTaskManager } from "../hooks/useTaskManager";
 import type { Task } from "../types/Task";
+import { Ratings } from "../components/Ratings";
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export const Home = () => {
 
   return (
     <div className="app-wrapper">
+      <Ratings rating={3.6}/>
       <TaskHeaderControls
         activeCount={activeCount}
         viewMode={viewMode}

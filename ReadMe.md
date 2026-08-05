@@ -39,7 +39,7 @@ const color: number | string = "fffff" //union
 2. Create Next JS TODO App with routes: `App Router` and `Navigation`
 
 ### Styling
-- styled component: https://styled-components.com/
+- styled component: https://styled-components.com/ && https://styled-components.com/docs/tooling
 - tailwind
 - normal styling
 - Frameworks: 
