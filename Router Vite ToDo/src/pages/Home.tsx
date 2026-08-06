@@ -10,6 +10,7 @@ import { Ratings } from "../components/Ratings";
 export const Home = () => {
   const navigate = useNavigate();
   const {
+    tasks,
     activeCount,
     filterStatus,
     setFilterStatus,
@@ -34,7 +35,7 @@ export const Home = () => {
 
   return (
     <div className="app-wrapper">
-      <Ratings rating={3.6}/>
+      <Ratings rating={tasks.length > 0 ? 5 - (activeCount * 5 / tasks.length) : 0} />
       <TaskHeaderControls
         activeCount={activeCount}
         viewMode={viewMode}
