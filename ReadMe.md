@@ -48,3 +48,9 @@ const color: number | string = "fffff" //union
 ### Routing
 - React router dom
 - React router
+
+### Contexts
+1. Redux & Redux toolkit
+2. Context API
+3. Zustand
+

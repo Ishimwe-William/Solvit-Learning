@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+.weather-container {
+  @apply w-full md:w-96 min-h-screen bg-white/10 backdrop-blur-md border-l border-white/20 p-8 flex flex-col justify-between text-white
+}
+.logo {
+  @apply pt-8 pl-52
+}
