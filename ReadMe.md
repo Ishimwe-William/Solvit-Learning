@@ -49,8 +49,16 @@ const color: number | string = "fffff" //union
 - React router dom
 - React router
 
-### Contexts
-1. Redux & Redux toolkit
-2. Context API
-3. Zustand
+### Contexts: reference -> Integration with toolkit
+1. [Redux & Redux toolkit](https://redux-toolkit.js.org/introduction/getting-started)
+   - store
+   - provider
+   - states
+   - thunk functions
+   - [persistance => storage](https://www.npmjs.com/package/redux-persist)
+   - [persistance => provider](https://www.npmjs.com/package/redux-persist)
+2. [Context API](https://react.dev/reference/react/useContext)
+   - provider
+   - context file -> states, functions
+3. [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction)
 
