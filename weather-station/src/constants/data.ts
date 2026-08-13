@@ -38,14 +38,15 @@ export const WeatherData = {
         "gust_mph": 11.6,
         "gust_kph": 18.7,
         "air_quality": {
-            "co": 293.70001220703125,
+            "co": 293.7,
             "no2": 18.5,
-            "o3": 234.60000610351562,
+            "o3": 234.6,
             "so2": 12,
-            "pm2_5": 13.600000381469727,
+            "pm2_5": 13.6,
             "pm10": 15,
             "us-epa-index": 1,
             "gb-defra-index": 2
         }
+
     }
 }
