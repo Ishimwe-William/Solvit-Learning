@@ -1,6 +1,6 @@
 import type {ReactNode} from "react";
 import {useAuth} from "../../hooks/useAuth.ts";
-import {NotLoggedIn} from "./notLoggedIn.tsx";
+import {LoginRegister} from "./loginRegister.tsx";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -18,7 +18,7 @@ export const ProtectedRoute = ({children}: ProtectedRouteProps) => {
     }
 
     if (!isAuthenticated) {
-        return <NotLoggedIn/>
+        return <LoginRegister isLogin={true}/>
     }
     return (
         <>{children}</>

@@ -3,7 +3,7 @@ import {LoginRegister} from "../components";
 import App from "../App.tsx";
 import {Layout} from "../layout";
 import {ProtectedRoute} from "../components/auth/ProtectedRoute.tsx";
-import {ExceptionPage} from "../components/exceptions";
+import {ExceptionPage} from "../components";
 
 export const router = createBrowserRouter(
     [

@@ -62,3 +62,22 @@ const color: number | string = "fffff" //union
    - context file -> states, functions
 3. [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction)
 
+Task for Today
+============
+
+1. Create Login/Register Page and/or OAuth 2.0
+2. Use context API with react
+3. Save the details of person in Firebase DB() or Mongoose DB
+4. Form validation using Use-form-hook with zod or joi validation
+
+Links:
+
+Firebase: 
+- https://console.firebase.google.com/
+- https://firebase.google.com/docs
+
+Context API:
+- https://www.geeksforgeeks.org/reactjs/explain-new-context-api-in-react/
+
+ 
+
