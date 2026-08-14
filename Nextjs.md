@@ -17,7 +17,7 @@
      -  Add student (random password)
      -  Approval student
 #### Send Email where necessary
+#### Context: Redux Toolkit
 ### Styling
 - [Tailwind CSS](https://tailwindcss.com/docs/installation/framework-guides/nextjs)
 - [Shadcn](https://ui.shadcn.com/)
-
