@@ -1,20 +1,18 @@
-import {useState} from "react";
 import {Button} from "../ui/button";
 import logo from "../../assets/logo.svg";
-import { IoPersonCircle } from "react-icons/io5";
+import {IoPersonCircle} from "react-icons/io5";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../../hooks/useAuth.ts";
 
 export const Navbar = () => {
-    const [isLoggedIn, setIsLogggedIn] = useState<boolean>(false);
+    const {user, isAuthenticated, logout} = useAuth();
+
+    const displayName = user?.displayName || user?.email?.split("@")[0] || "User Profile"
+
     const navigate = useNavigate();
 
     const handleProfile = () => {
-        console.log("hanldeProfile")
-    }
-
-    const handleLogout = () => {
-        navigate("/");
-        setIsLogggedIn(false)
+        console.log("handleProfile")
     }
 
     return (
@@ -32,10 +30,12 @@ export const Navbar = () => {
                 </div>
             </div>
             <div className="flex items-center gap-2">
-                {isLoggedIn ? (
+                {isAuthenticated ? (
                     <>
-                        <Button variant="link" action={handleLogout}>Logout</Button>
-                        <Button variant="icon" rightIcon={<IoPersonCircle size={24}/>} action={handleProfile} >Profile</Button>
+                        <Button variant="link" action={logout}>Logout</Button>
+                        <Button variant="link" rightIcon={<IoPersonCircle size={24}/>} action={handleProfile}>
+                            <span>{displayName}</span>
+                        </Button>
                     </>
                 ) : (
                     <>

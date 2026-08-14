@@ -9,11 +9,11 @@ export interface Data {
 
 export interface ErrorType {
     status?: number | string;
-    data?: Data;
+    data?: Data | null | undefined;
     error?: string;
 }
 
 export interface ExceptionPageProps {
     error?: ErrorType | unknown;
 }
-
+

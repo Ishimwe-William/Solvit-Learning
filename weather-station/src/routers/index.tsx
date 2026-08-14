@@ -2,16 +2,23 @@ import {createBrowserRouter} from "react-router-dom";
 import {LoginRegister} from "../components";
 import App from "../App.tsx";
 import {Layout} from "../layout";
+import {ProtectedRoute} from "../components/auth/ProtectedRoute.tsx";
+import {ExceptionPage} from "../components/exceptions";
 
-export const routers = createBrowserRouter(
+export const router = createBrowserRouter(
     [
         {
             path: "/",
             element: <Layout/>,
+            errorElement: <ExceptionPage/>,
             children: [
                 {
                     index: true,
-                    element: <App/>
+                    element: (
+                        <ProtectedRoute>
+                            <App/>
+                        </ProtectedRoute>
+                    )
                 },
                 {
                     path: "login",

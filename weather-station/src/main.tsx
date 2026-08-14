@@ -3,13 +3,16 @@ import {createRoot} from 'react-dom/client'
 import './index.css'
 import {Provider} from "react-redux";
 import {store} from "./store";
-import {routers} from "./routers";
+import {router} from "./routers";
 import {RouterProvider} from "react-router-dom";
+import {AuthProvider} from "./contexts/AuthProvider.tsx";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <Provider store={store}>
-            <RouterProvider router={routers}/>
+            <AuthProvider>
+                <RouterProvider router={router}/>
+            </AuthProvider>
         </Provider>
-    </StrictMode>,
+    </StrictMode>
 )

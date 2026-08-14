@@ -5,4 +5,8 @@ export {ForecastRow} from "./weather/forecastRow"
 export {Button} from "./ui/button"
 export {Navbar} from "./navbar"
 export {LoginRegister} from "./auth/loginRegister"
+export {NotLoggedIn} from "./auth/notLoggedIn"
+export {ExceptionPage} from "./exceptions"
+
+
 
