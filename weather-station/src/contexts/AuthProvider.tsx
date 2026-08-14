@@ -29,6 +29,9 @@ export const AuthProvider = ({children}: ContainerProps) => {
         return () => unsubscribe();
     }, []);
 
+    // const validateTokenExpiriry = () => {
+    // }
+
     const handleLogin = async (email?: string, password?: string) => {
         if (!email || !password) return;
 
@@ -72,7 +75,7 @@ export const AuthProvider = ({children}: ContainerProps) => {
         }
     }
 
-    const handleGithugLogin = async () => {
+    const handleGithubLogin = async () => {
 
         try {
             const provider = new GithubAuthProvider();
@@ -91,7 +94,7 @@ export const AuthProvider = ({children}: ContainerProps) => {
             login: handleLogin,
             register: handleRegister,
             loginWithGoogle: handleGoogleLogin,
-            loginWithGithub: handleGithugLogin,
+            loginWithGithub: handleGithubLogin,
             logout: handleLogout,
         }}>
             {children}
