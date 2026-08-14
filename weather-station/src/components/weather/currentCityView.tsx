@@ -37,20 +37,22 @@ export const CurrentCityView = ({temp, city, timeDate, icon, valueIcon, isLoadin
     return (
         <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-6 py-4 md:py-8 z-10">
             {isLoading ? (
-                <>
-                    <p>Loading...</p>
-                </>
+                <div className="flex flex-col sm:flex-row sm:items-end gap-4 animate-pulse w-full">
+                    <div className="h-24 w-36 bg-white/20 rounded-2xl" />
+                    <div className="flex flex-col space-y-3 mb-1">
+                        <div className="h-12 w-48 bg-white/20 rounded-xl" />
+                        <div className="h-5 w-36 bg-white/20 rounded-lg" />
+                    </div>
+                </div>
             ) : (
                 <>
                     <div className="flex items-start">
-                <span
-                    className="text-7xl sm:text-8xl md:text-9xl font-extralight tracking-tighter text-white drop-shadow-lg leading-none">
-                    {temp}
-                </span>
-                        <span
-                            className="text-5xl sm:text-6xl md:text-7xl text-white/90 font-extralight drop-shadow-md leading-none self-start -mt-2">
-                    {valueIcon}
-                </span>
+                        <span className="text-7xl sm:text-8xl md:text-9xl font-extralight tracking-tighter text-white drop-shadow-lg leading-none">
+                            {temp}
+                        </span>
+                        <span className="text-5xl sm:text-6xl md:text-7xl text-white/90 font-extralight drop-shadow-md leading-none self-start -mt-2">
+                            {valueIcon}
+                        </span>
                     </div>
 
                     <div className="flex flex-col space-y-1 mb-1">
