@@ -137,8 +137,7 @@ nextjs-student-ms/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/nextjs-student-ms.git
-   cd nextjs-student-ms
+   git clone https://github.com/Ishimwe-William/Solvit-Learning/tree/master/nextjs-student-ms.git
    ```
 
 2. **Install dependencies:**
@@ -162,7 +161,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 
-# Email Provider Configuration (e.g. Resend)
+# Email Provider Configuration (Resend)
 RESEND_API_KEY=re_your_api_key_here
 EMAIL_FROM=notifications@yourdomain.com
 
@@ -184,6 +183,44 @@ CREATE TABLE profiles (
   status TEXT CHECK (status IN ('pending', 'approved', 'suspended')) DEFAULT 'pending',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE public.profile ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own profile"
+    ON public.profile FOR SELECT
+                                   USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile"
+    ON public.profile FOR INSERT
+    WITH CHECK (auth.uid() = id);
+
+    CREATE POLICY "Users can update own profile"
+    ON public.profile FOR UPDATE
+                                              USING (auth.uid() = id);
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+    RETURNS TRIGGER AS $$
+BEGIN
+INSERT INTO public.profile (id, email, full_name, role, status)
+VALUES (
+         NEW.id,
+         NEW.email,
+         COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+         COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
+         CASE
+           -- If it's the very first user in the table, make them an approved admin
+           WHEN (SELECT count(*) FROM public.profile) = 0 THEN 'approved'
+           ELSE 'pending'
+           END
+       );
+RETURN NEW;
+END;
+    $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- Attendance table
 CREATE TABLE attendance (
