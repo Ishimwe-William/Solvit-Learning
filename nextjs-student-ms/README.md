@@ -246,6 +246,50 @@ CREATE TABLE leave_requests (
   reviewed_by UUID REFERENCES profiles(id),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Allow authenticated users to view profiles (or restrict to teachers/admins)
+CREATE POLICY "Allow teachers and admins to view all profiles"
+    ON public.profiles
+    FOR SELECT
+                 TO authenticated
+                 USING (
+                 -- either everyone authenticated can read profiles:
+                 true
+                 -- OR only teachers/admins:
+                 -- auth.uid() IN (SELECT id FROM profiles WHERE role IN ('teacher', 'admin'))
+                 );
+
+-- 1. Enable RLS on profiles if not already enabled
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- 2. Allow teachers & admins to update any profile status
+CREATE POLICY "Allow teachers and admins to update profiles"
+    ON public.profiles
+    FOR UPDATE
+                 TO authenticated
+                 USING (
+                 -- Check if the person making the update is a teacher or admin
+                 EXISTS (
+                 SELECT 1 FROM public.profiles
+                 WHERE id = auth.uid() AND role IN ('teacher', 'admin')
+                 )
+                 )
+        WITH CHECK (
+                 EXISTS (
+                 SELECT 1 FROM public.profiles
+                 WHERE id = auth.uid() AND role IN ('teacher', 'admin')
+                 )
+                 );
+
+(For quick local development/testing without role restrictions, you can temporarily run:)
+
+CREATE POLICY "Allow all authenticated users to update profiles"
+    ON public.profiles
+    FOR UPDATE
+                 TO authenticated
+                 USING (true)
+        WITH CHECK (true);
+
 ```
 
 ### Running the Application

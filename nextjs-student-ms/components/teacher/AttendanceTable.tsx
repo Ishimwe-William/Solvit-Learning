@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
+import { IoSaveOutline, IoCalendarOutline } from "react-icons/io5";
 
 interface MemberAttendanceRow {
   id: string;
@@ -31,8 +32,9 @@ export function AttendanceTable() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-            Select Date:
+          <label className="text-xs font-medium text-muted-foreground whitespace-nowrap flex items-center gap-1.5">
+            <IoCalendarOutline size={14} />
+            <span>Select Date:</span>
           </label>
           <input
             type="date"
@@ -40,8 +42,9 @@ export function AttendanceTable() {
             className="w-full sm:w-auto rounded-lg border border-input bg-background px-3 py-1.5 text-xs sm:text-sm text-foreground focus:border-primary focus:outline-none"
           />
         </div>
-        <Button variant="primary" size="sm" className="w-full sm:w-auto">
-          Save All Records
+        <Button variant="primary" size="sm" className="w-full sm:w-auto gap-1.5 font-medium">
+          <IoSaveOutline size={15} />
+          <span>Save All Records</span>
         </Button>
       </div>
 

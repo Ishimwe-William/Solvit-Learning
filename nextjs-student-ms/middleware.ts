@@ -27,53 +27,69 @@ export async function middleware(request: NextRequest) {
     const {data: {user}} = await supabase.auth.getUser();
     const {pathname} = request.nextUrl;
 
+    const isForgotPasswordPage = pathname.startsWith("/forgot-password");
+    const isResetPasswordPage = pathname.startsWith("/reset-password");
+
     const isAuthPage =
         pathname.startsWith("/login") ||
-        pathname.startsWith("/register");
+        pathname.startsWith("/register") ||
+        isForgotPasswordPage ||
+        isResetPasswordPage;
 
     const isPendingApprovalPage = pathname === "/pending-approval";
+    const isSuspendedPage = pathname === "/suspended";
     const isApiRoute = pathname.startsWith("/api");
     const isLandingPage = pathname === "/";
 
     if (!user) {
-        if (!isAuthPage && !isApiRoute && !isLandingPage && !isPendingApprovalPage) {
+        if (!isAuthPage && !isApiRoute && !isLandingPage && !isPendingApprovalPage && !isSuspendedPage) {
             return NextResponse.redirect(new URL("/login", request.url));
         }
         return supabaseResponse;
     }
 
-    let role = user.user_metadata?.role as string | undefined;
-    let status = user.user_metadata?.status as string | undefined;
+    const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, status")
+        .eq("id", user.id)
+        .single();
 
-    if (!role || !status) {
-        const { data: profile } = await supabase
-            .from("profiles")
-            .select("role, status")
-            .eq("id", user.id)
-            .single();
+    const role = profile?.role || user.user_metadata?.role;
+    const status = profile?.status || user.user_metadata?.status;
 
-        role = role || profile?.role;
-        status = status || profile?.status;
-    }
-
-    if (!role || !status) {
-        if (isAuthPage || isApiRoute || isPendingApprovalPage) return supabaseResponse;
-        return NextResponse.redirect(new URL("/pending-approval", request.url));
+    if (isResetPasswordPage) {
+        return supabaseResponse;
     }
 
     if (status === "pending") {
-        if (isPendingApprovalPage) {
+        if (isPendingApprovalPage || isLandingPage) {
             return supabaseResponse;
         }
         return NextResponse.redirect(new URL("/pending-approval", request.url));
     }
 
-    const defaultHome =
-        role === "teacher" || role === "admin"
-            ? "/teacher/dashboard"
-            : "/student/attendance";
+    if (status === "suspended" || status === "rejected") {
+        if (isSuspendedPage || isLandingPage) {
+            return supabaseResponse;
+        }
+        return NextResponse.redirect(new URL("/suspended", request.url));
+    }
 
-    if (isAuthPage || isPendingApprovalPage) {
+    if ((isPendingApprovalPage || isSuspendedPage) && status === "approved") {
+        const defaultHome =
+            role === "teacher" || role === "admin"
+                ? "/teacher/dashboard"
+                : "/student/attendance";
+
+        return NextResponse.redirect(new URL(defaultHome, request.url));
+    }
+
+    if ((pathname.startsWith("/login") || pathname.startsWith("/register") || isForgotPasswordPage) && status === "approved") {
+        const defaultHome =
+            role === "teacher" || role === "admin"
+                ? "/teacher/dashboard"
+                : "/student/attendance";
+
         return NextResponse.redirect(new URL(defaultHome, request.url));
     }
 

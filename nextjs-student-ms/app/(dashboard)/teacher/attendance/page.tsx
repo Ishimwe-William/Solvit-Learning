@@ -1,24 +1,85 @@
-import React from "react";
-import { DashboardHeader } from "@/components/shared/DashboardHeader";
-import { AttendanceTable } from "@/components/teacher/AttendanceTable";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import React, { Suspense } from "react";
+import { createClient } from "@/lib/supabase/server";
+import { CourseAttendanceRecorder } from "@/components/teacher/CourseAttendanceRecorder";
+import { Course, UserProfile, AttendanceStatus } from "@/types";
 
-export default function AttendancePage() {
+export default async function AttendancePage() {
+  const supabase = await createClient();
+
+  // Parallelize queries
+  const [
+    { data: coursesData },
+    { data: enrollmentsData },
+    { data: attendanceData },
+  ] = await Promise.all([
+    supabase
+      .from("courses")
+      .select("*")
+      .order("name", { ascending: true }),
+
+    supabase
+      .from("course_enrollments")
+      .select(`
+        course_id,
+        profiles:profiles!student_id (
+          id,
+          full_name,
+          email,
+          role,
+          status,
+          created_at
+        )
+      `),
+
+    supabase
+      .from("attendance_records")
+      .select("course_id, student_id, date, status, remarks"),
+  ]);
+
+  const courses: Course[] = coursesData || [];
+
+  const enrolledStudentsMap: Record<string, UserProfile[]> = {};
+  (enrollmentsData || []).forEach((e: any) => {
+    if (e.profiles && e.profiles.status === "approved") {
+      if (!enrolledStudentsMap[e.course_id]) {
+        enrolledStudentsMap[e.course_id] = [];
+      }
+      enrolledStudentsMap[e.course_id].push({
+        id: e.profiles.id,
+        full_name: e.profiles.full_name,
+        email: e.profiles.email,
+        role: e.profiles.role,
+        status: e.profiles.status,
+        created_at: e.profiles.created_at,
+      });
+    }
+  });
+
+  const existingAttendanceMap: Record<
+    string,
+    Record<string, { status: AttendanceStatus; remarks?: string }>
+  > = {};
+
+  (attendanceData || []).forEach((rec: any) => {
+    const key = `${rec.course_id}_${rec.date}`;
+    if (!existingAttendanceMap[key]) {
+      existingAttendanceMap[key] = {};
+    }
+    existingAttendanceMap[key][rec.student_id] = {
+      status: rec.status as AttendanceStatus,
+      remarks: rec.remarks,
+    };
+  });
+
   return (
     <div className="space-y-6">
-      <DashboardHeader
-        heading="Attendance Recording"
-        text="Mark, adjust, and record attendance for members."
-      />
-
-      <Card className="p-4 sm:p-6">
-        <CardHeader className="mb-3 sm:mb-4">
-          <CardTitle className="text-base sm:text-lg">Daily Attendance Roster</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AttendanceTable />
-        </CardContent>
-      </Card>
+      <Suspense fallback={<div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Loading Attendance Roster...</div>}>
+        <CourseAttendanceRecorder
+          courses={courses}
+          enrolledStudentsMap={enrolledStudentsMap}
+          existingAttendanceMap={existingAttendanceMap}
+        />
+      </Suspense>
     </div>
   );
 }

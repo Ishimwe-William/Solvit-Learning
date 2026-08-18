@@ -1,6 +1,7 @@
 "use client";
 
 import React, {SubmitEventHandler, useState, useTransition} from "react";
+import Link from "next/link";
 import {Button} from "@/components/ui/Button";
 import {loginWithEmail, loginWithGoogle, studentRegister} from "@/app/(auth)/actions";
 import {useSearchParams} from "next/navigation";
@@ -106,9 +107,9 @@ export function AuthForm({initialMode = "signin"}: AuthFormProps) {
                             Password
                         </label>
                         {mode === "signin" && (
-                            <a href="#" className="text-xs text-primary hover:underline">
+                            <Link href="/forgot-password" className="text-xs text-primary hover:underline">
                                 Forgot password?
-                            </a>
+                            </Link>
                         )}
                     </div>
                     <input

@@ -4,10 +4,10 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {FaCalendarCheck, FaRegChartBar, FaUserCheck, FaUsers} from "react-icons/fa";
+import {FaCalendarCheck, FaRegChartBar, FaUserCheck, FaUsers, FaBook} from "react-icons/fa";
 import {MdSpaceDashboard} from "react-icons/md";
 import {LuNotebookPen} from "react-icons/lu";
-import {IoHourglass} from "react-icons/io5";
+import {IoHourglass, IoCloseOutline} from "react-icons/io5";
 import {ImCheckboxChecked} from "react-icons/im";
 import {logout} from "@/app/(auth)/actions";
 import {FiLogOut} from "react-icons/fi";
@@ -39,6 +39,7 @@ export function Sidebar({ isOpenOnMobile = false, onCloseMobile }: SidebarProps)
     {
       title: "Management",
       links: [
+        { href: "/teacher/courses", label: "Course Management", icon: <FaBook size={19} /> },
         { href: "/teacher/students", label: "Member Directory", icon: <FaUsers size={20} /> },
         { href: "/teacher/approvals", label: "Account Approvals", icon: <ImCheckboxChecked size={20} /> },
       ],
@@ -75,11 +76,12 @@ export function Sidebar({ isOpenOnMobile = false, onCloseMobile }: SidebarProps)
           </div>
           {onCloseMobile && (
             <button
+              type="button"
               onClick={onCloseMobile}
-              className="md:hidden text-muted-foreground hover:text-foreground p-1 text-sm"
+              className="md:hidden text-muted-foreground hover:text-foreground p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg cursor-pointer hover:bg-muted touch-manipulation active:bg-muted"
               aria-label="Close menu"
             >
-              ✕
+              <IoCloseOutline size={22} />
             </button>
           )}
         </div>
@@ -100,7 +102,7 @@ export function Sidebar({ isOpenOnMobile = false, onCloseMobile }: SidebarProps)
                       href={link.href}
                       onClick={onCloseMobile}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors",
+                        "flex items-center gap-3 px-3 py-2.5 min-h-[42px] text-xs sm:text-sm font-medium rounded-lg transition-all touch-manipulation active:scale-[0.98]",
                         isActive
                           ? "bg-primary text-primary-foreground font-semibold shadow-xs"
                           : "text-foreground hover:bg-accent hover:text-accent-foreground"
@@ -119,11 +121,11 @@ export function Sidebar({ isOpenOnMobile = false, onCloseMobile }: SidebarProps)
 
       <form action={logout} className="border-t border-border pt-4">
         <button
-          type={"submit"}
+          type="submit"
           onClick={onCloseMobile}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 min-h-[44px] text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-all cursor-pointer touch-manipulation active:scale-[0.98]"
         >
-          <FiLogOut size={22} />
+          <FiLogOut size={20} />
           <span>Sign Out</span>
         </button>
       </form>
@@ -141,7 +143,7 @@ export function Sidebar({ isOpenOnMobile = false, onCloseMobile }: SidebarProps)
       {isOpenOnMobile && (
         <div
           onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden touch-manipulation"
           aria-hidden="true"
         />
       )}

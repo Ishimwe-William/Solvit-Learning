@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Navbar } from "@/components/shared/Navbar";
-import {PiChalkboardTeacherDuotone, PiStudentDuotone} from "react-icons/pi";
+import { PiChalkboardTeacherDuotone, PiStudentDuotone } from "react-icons/pi";
+import { IoArrowForwardOutline } from "react-icons/io5";
 
 export default function Home() {
   return (
@@ -28,14 +29,14 @@ export default function Home() {
               Track attendance percentage, apply for leave or sick days, and view performance charts.
             </p>
             <div className="flex flex-col gap-2">
-              <Link href="/student/attendance" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Attendance History
+              <Link href="/student/attendance" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Attendance History
               </Link>
-              <Link href="/student/leave" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Ask Leave / Sick Day
+              <Link href="/student/leave" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Ask Leave / Sick Day
               </Link>
-              <Link href="/student/reports" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Reports & Statistics
+              <Link href="/student/reports" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Reports & Statistics
               </Link>
             </div>
           </div>
@@ -49,20 +50,20 @@ export default function Home() {
               Record daily attendance, review leave requests, add students with random passwords, and approve accounts.
             </p>
             <div className="flex flex-col gap-2">
-              <Link href="/teacher/dashboard" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Analytics Dashboard
+              <Link href="/teacher/dashboard" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Analytics Dashboard
               </Link>
-              <Link href="/teacher/attendance" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Record Attendance
+              <Link href="/teacher/attendance" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Record Attendance
               </Link>
-              <Link href="/teacher/leave-requests" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Leave Approvals
+              <Link href="/teacher/leave-requests" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Leave Approvals
               </Link>
-              <Link href="/teacher/students" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Add & Manage Students
+              <Link href="/teacher/students" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Add & Manage Students
               </Link>
-              <Link href="/teacher/approvals" className="text-xs sm:text-sm text-primary hover:underline font-medium">
-                → Student Approvals
+              <Link href="/teacher/approvals" className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:underline font-medium">
+                <IoArrowForwardOutline size={14} /> Student Approvals
               </Link>
             </div>
           </div>

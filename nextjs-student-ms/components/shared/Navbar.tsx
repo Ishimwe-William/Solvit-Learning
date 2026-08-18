@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/app/(auth)/actions";
 import { type User } from "@supabase/supabase-js";
+import { IoMenuOutline, IoCloseOutline, IoEllipsisVerticalOutline } from "react-icons/io5";
 
 interface NavbarProps {
   onToggleMobileMenu?: () => void;
@@ -18,6 +19,15 @@ interface NavbarProps {
 export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = null }: NavbarProps) {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(initialUser);
+  const [userStatus, setUserStatus] = useState<string | null>(
+    (initialUser?.user_metadata?.status as string) || null
+  );
+  const [userRole, setUserRole] = useState<string | null>(
+    (initialUser?.user_metadata?.role as string) || null
+  );
+  const [userFullName, setUserFullName] = useState<string | null>(
+    (initialUser?.user_metadata?.full_name as string) || null
+  );
   const [loading, setLoading] = useState(!initialUser);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isLoggingOut, startLogoutTransition] = useTransition();
@@ -25,16 +35,49 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
   useEffect(() => {
     const supabase = createClient();
 
-    // Fetch live user if not already provided
-    supabase.auth.getUser().then(({ data: { user: liveUser } }) => {
-      setUser(liveUser);
+    const fetchUserProfile = async (currentUser: User | null) => {
+      if (!currentUser) {
+        setUser(null);
+        setUserStatus(null);
+        setUserRole(null);
+        setUserFullName(null);
+        setLoading(false);
+        return;
+      }
+
+      setUser(currentUser);
+
+      // Always query the profiles table as the single source of truth for dynamic status & role
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, status, full_name")
+        .eq("id", currentUser.id)
+        .single();
+
+      const status = profile?.status || (currentUser.user_metadata?.status as string) || "pending";
+      const role = profile?.role || (currentUser.user_metadata?.role as string) || "student";
+      const fullName =
+        profile?.full_name ||
+        (currentUser.user_metadata?.full_name as string) ||
+        currentUser.email?.split("@")[0] ||
+        "User";
+
+      setUserStatus(status);
+      setUserRole(role);
+      setUserFullName(fullName);
       setLoading(false);
+    };
+
+    // Fetch live user and profile
+    supabase.auth.getUser().then(({ data: { user: liveUser } }) => {
+      fetchUserProfile(liveUser);
     });
 
-    // Listen for auth state transitions (login, logout, refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+    // Listen for auth transitions
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      fetchUserProfile(session?.user ?? null);
     });
 
     return () => {
@@ -42,12 +85,24 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
     };
   }, []);
 
-  const role = user?.user_metadata?.role || (pathname.startsWith("/teacher") ? "teacher" : "student");
-  const fullName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
+  const isPending = userStatus === "pending";
+  const isSuspended = userStatus === "suspended" || userStatus === "rejected";
+  const isApproved = !!user && userStatus === "approved";
+
+  const role =
+    userRole ||
+    (pathname.startsWith("/teacher") ? "teacher" : "student");
+
+  const fullName =
+    userFullName ||
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "User";
 
   // Role-specific navigation tabs
   const teacherLinks = [
     { href: "/teacher/dashboard", label: "Dashboard" },
+    { href: "/teacher/courses", label: "Courses" },
     { href: "/teacher/attendance", label: "Record Attendance" },
     { href: "/teacher/leave-requests", label: "Leave Approvals" },
     { href: "/teacher/students", label: "Members" },
@@ -65,7 +120,8 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
     { href: "/student/attendance", label: "Student Portal" },
   ];
 
-  const mainLinks = !user
+  // Only show internal portal links to approved users
+  const mainLinks = !isApproved
     ? publicLinks
     : role === "teacher" || role === "admin"
     ? teacherLinks
@@ -77,31 +133,32 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
     });
   };
 
-  const homeUrl = user
+  const homeUrl = isApproved
     ? role === "teacher" || role === "admin"
       ? "/teacher/dashboard"
       : "/student/attendance"
+    : isPending
+    ? "/pending-approval"
+    : isSuspended
+    ? "/suspended"
     : "/";
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur-md">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          {/* Mobile Sidebar Hamburger */}
+          {/* Mobile Sidebar Hamburger (Dashboard only) */}
           {onToggleMobileMenu && (
             <button
+              type="button"
               onClick={onToggleMobileMenu}
               aria-label="Toggle Navigation Menu"
-              className="inline-flex md:hidden items-center justify-center p-2 rounded-lg text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
+              className="inline-flex md:hidden items-center justify-center p-2 min-h-[44px] min-w-[44px] rounded-lg text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer touch-manipulation active:bg-muted"
             >
               {isMobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <IoCloseOutline size={26} />
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <IoMenuOutline size={26} />
               )}
             </button>
           )}
@@ -142,7 +199,9 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
 
         {/* Auth CTA / User Profile Header Actions */}
         <div className="hidden sm:flex items-center gap-3">
-          {!loading && user ? (
+          {loading ? (
+            <div className="w-24 h-8 rounded-md bg-muted/40 animate-pulse" />
+          ) : isApproved ? (
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-muted/60 border border-border">
                 <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold uppercase">
@@ -166,7 +225,39 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
                 {isLoggingOut ? "Signing out..." : "Sign Out"}
               </button>
             </div>
-          ) : !loading ? (
+          ) : isPending ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/pending-approval"
+                className="text-xs font-medium text-warning bg-warning/10 border border-warning/25 hover:bg-warning/20 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Pending Review
+              </Link>
+              <button
+                onClick={handleSignOut}
+                disabled={isLoggingOut}
+                className="text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/20 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {isLoggingOut ? "..." : "Sign Out"}
+              </button>
+            </div>
+          ) : isSuspended ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/suspended"
+                className="text-xs font-medium text-destructive bg-destructive/10 border border-destructive/25 hover:bg-destructive/20 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Account Suspended
+              </Link>
+              <button
+                onClick={handleSignOut}
+                disabled={isLoggingOut}
+                className="text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/20 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {isLoggingOut ? "..." : "Sign Out"}
+              </button>
+            </div>
+          ) : (
             <>
               <Link
                 href="/login"
@@ -181,35 +272,32 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
                 Get Started
               </Link>
             </>
-          ) : (
-            <div className="w-24 h-8 rounded-md bg-muted/40 animate-pulse" />
           )}
         </div>
 
         {/* Mobile View Menu Toggle */}
         <div className="flex sm:hidden items-center gap-2">
           <button
+            type="button"
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="p-2 rounded-lg text-foreground hover:bg-muted focus:outline-none"
+            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-foreground hover:bg-muted focus:outline-none cursor-pointer touch-manipulation active:bg-muted"
             aria-label="Toggle Quick Links"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
+            <IoEllipsisVerticalOutline size={22} />
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer Dropdown */}
       {mobileNavOpen && (
-        <div className="sm:hidden border-t border-border bg-card px-4 py-3 space-y-3">
+        <div className="sm:hidden border-t border-border bg-card px-4 py-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
           <div className="grid grid-cols-2 gap-2 pb-2 border-b border-border">
             {mainLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileNavOpen(false)}
-                className="text-center text-xs font-medium py-2 rounded-md bg-muted text-foreground hover:bg-accent"
+                className="text-center text-xs font-semibold py-2.5 px-2 min-h-[40px] flex items-center justify-center rounded-lg bg-muted text-foreground hover:bg-accent touch-manipulation active:scale-[0.98] transition-all"
               >
                 {link.label}
               </Link>
@@ -217,39 +305,78 @@ export function Navbar({ onToggleMobileMenu, isMobileMenuOpen, initialUser = nul
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            {user ? (
-              <div className="w-full flex items-center justify-between">
+            {isApproved ? (
+              <div className="w-full flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold uppercase">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold uppercase">
                     {fullName.charAt(0)}
                   </div>
-                  <span className="text-xs font-medium text-foreground">{fullName} ({role})</span>
+                  <span className="text-xs font-medium text-foreground truncate max-w-[140px]">
+                    {fullName} ({role})
+                  </span>
                 </div>
                 <button
+                  type="button"
                   onClick={handleSignOut}
                   disabled={isLoggingOut}
-                  className="text-xs font-semibold text-destructive px-2.5 py-1 rounded bg-destructive/10 cursor-pointer"
+                  className="text-xs font-semibold text-destructive px-3 py-2 min-h-[36px] rounded-lg bg-destructive/10 hover:bg-destructive/20 cursor-pointer touch-manipulation active:scale-[0.98] transition-all"
+                >
+                  {isLoggingOut ? "..." : "Sign Out"}
+                </button>
+              </div>
+            ) : isPending ? (
+              <div className="w-full flex items-center justify-between gap-2">
+                <Link
+                  href="/pending-approval"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="text-xs font-medium text-warning bg-warning/10 border border-warning/20 px-3 py-2 rounded-lg"
+                >
+                  Pending Review
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={isLoggingOut}
+                  className="text-xs font-semibold text-destructive px-3 py-2 min-h-[36px] rounded-lg bg-destructive/10 hover:bg-destructive/20 cursor-pointer touch-manipulation active:scale-[0.98] transition-all"
+                >
+                  {isLoggingOut ? "..." : "Sign Out"}
+                </button>
+              </div>
+            ) : isSuspended ? (
+              <div className="w-full flex items-center justify-between gap-2">
+                <Link
+                  href="/suspended"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-lg"
+                >
+                  Account Suspended
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={isLoggingOut}
+                  className="text-xs font-semibold text-destructive px-3 py-2 min-h-[36px] rounded-lg bg-destructive/10 hover:bg-destructive/20 cursor-pointer touch-manipulation active:scale-[0.98] transition-all"
                 >
                   {isLoggingOut ? "..." : "Sign Out"}
                 </button>
               </div>
             ) : (
-              <>
+              <div className="w-full flex items-center justify-end gap-2">
                 <Link
                   href="/login"
                   onClick={() => setMobileNavOpen(false)}
-                  className="text-xs font-medium text-muted-foreground hover:text-foreground"
+                  className="text-xs font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileNavOpen(false)}
-                  className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+                  className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground touch-manipulation"
                 >
                   Get Started
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>

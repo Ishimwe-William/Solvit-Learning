@@ -1,26 +1,49 @@
-export type UserRole = "member" | "manager" | "admin" | "user";
-export type UserStatus = "pending" | "approved" | "suspended";
+export type UserRole = "student" | "teacher" | "admin";
+export type UserStatus = "pending" | "approved" | "suspended" | "rejected";
 
 export interface UserProfile {
   id: string;
   email: string;
-  fullName: string;
+  full_name: string;
   role: UserRole;
   status: UserStatus;
-  avatarUrl?: string;
-  createdAt: string;
+  avatar_url?: string;
+  created_at: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  teacher_id?: string;
+  created_at?: string;
+  enrolled_count?: number;
+}
+
+export interface CourseEnrollment {
+  id: string;
+  course_id: string;
+  student_id: string;
+  status: "active" | "completed" | "dropped";
+  enrolled_at: string;
+  student?: UserProfile;
+  course?: Course;
 }
 
 export type AttendanceStatus = "present" | "absent" | "late" | "excused";
 
 export interface AttendanceRecord {
   id: string;
-  userId: string;
-  userName?: string;
+  course_id: string;
+  student_id: string;
   date: string;
   status: AttendanceStatus;
   remarks?: string;
-  markedBy?: string;
+  marked_by?: string;
+  created_at?: string;
+  student?: UserProfile;
+  course?: Course;
 }
 
 export type LeaveType = "sick" | "personal" | "emergency";
@@ -28,16 +51,19 @@ export type LeaveStatus = "pending" | "approved" | "rejected";
 
 export interface LeaveRequest {
   id: string;
-  userId: string;
-  userName?: string;
+  student_id: string;
+  course_id?: string;
   type: LeaveType;
-  startDate: string;
-  endDate: string;
+  start_date: string;
+  end_date: string;
   reason: string;
   status: LeaveStatus;
-  reviewedBy?: string;
-  reviewRemarks?: string;
-  createdAt: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
+  review_remarks?: string;
+  created_at: string;
+  student?: UserProfile;
+  course?: Course;
 }
 
 export interface AttendanceStats {
@@ -48,4 +74,11 @@ export interface AttendanceStats {
   excusedCount: number;
   attendancePercentage: number;
   approvedLeaves: number;
+}
+
+export interface EmailObject {
+  to: string;
+  subject: string;
+  htmlData: string;
+  appName?: string;
 }
